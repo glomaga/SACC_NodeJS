@@ -25,9 +25,11 @@ router.get('/animals', function (req, res, next) {
 
 //=================2.GET ANIMAL BY ID =====================//
 router.get('/animal/:id', function (req, res, next) {
+
     var id = req.params.id;
     var query = { _id: new mongodb.ObjectID(id) };
     let db = req.app.locals.db;
+    console.log("entro a select" + id);
     db.collection('animal').findOne(query, function (err, values) {
         res.json(values);
     });
@@ -40,6 +42,7 @@ router.get('/animal/:id', function (req, res, next) {
 router.post('/animal', function (req, res, next) {
     let db = req.app.locals.db;
     console.log("save new values");
+    console.log(req.body);
     var errors = "";
     if (req.body.an_name.length === 0 || req.body.an_name == null) {
         errors = errors + "an_name is required";
@@ -51,6 +54,7 @@ router.post('/animal', function (req, res, next) {
         res.sendStatus(400);
         res.end(errors);
     } else {
+       
         let animal = ProcessAnimalBody(req, "insert");
         console.log("data to save" + animal);
 
@@ -272,8 +276,8 @@ router.delete('/animal/deworm/:id', function (req, res) {
     console.log("delete deworm values");
     id = req.params.id;
     var query = { "_id": new mongodb.ObjectID(id) };
-    console.log("id" + util.inspect(query));
-
+    console.log("id Animal aborrar " + util.inspect(query));
+    console.log("id deworm  a borrar " + util.inspect(req.body.de_id));
     var operator = { $pull: { "an_deworm": { "de_id": new mongodb.ObjectID(req.body.de_id) } } };
 
     console.log("operator" + util.inspect(operator));
@@ -305,11 +309,12 @@ router.delete('/animal/microchip/:id', function (req, res) {
 //=========================================================HELPER METHODS===================================//
 //==========================================================================================================//
 function ProcessAnimalBody(req, type) {
+    console.log("entro a procesar");
     let animal;
     if (type == "insert") {
         animal = {
             "an_name": req.body.an_name,
-            "an_gender": req.body.gender,
+            "an_gender": req.body.an_gender,
             "an_neutered": req.body.an_neutered,
             "an_birth": new Date(req.body.an_birth),
             "an_color": req.body.an_color,
@@ -321,13 +326,13 @@ function ProcessAnimalBody(req, type) {
             "an_owner": req.body.an_owner,
             "an_deworm": req.body.an_deworm,
             "an_vaccine": req.body.an_vaccine,
-            "an_microchip": req.body.microchip
+            "an_microchip": req.body.an_microchip
         }
     }
     if (type == "update") {
         animal = {
             "an_name": req.body.an_name,
-            "an_gender": req.body.gender,
+            "an_gender": req.body.an_gender,
             "an_neutered": req.body.an_neutered,
             "an_birth": new Date(req.body.an_birth),
             "an_color": req.body.an_color,
@@ -338,7 +343,7 @@ function ProcessAnimalBody(req, type) {
             "an_owner": req.body.an_owner,
             "an_deworm": req.body.an_deworm,
             "an_vaccine": req.body.an_vaccine,
-            "an_microchip": req.body.microchip
+            "an_microchip": req.body.an_microchip
         }
     }
 
